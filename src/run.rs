@@ -1,34 +1,63 @@
+use execute::Execute;
+use std::process::Command;
+
 use crate::args::Arguments;
 
 pub fn execute(args: Arguments) {
-    let github_link = format!("https://github.com/{}", args.repo);
-    let clone_cmd = match args.name {
-        Some(name) => format!("git clone {} {}", github_link, name),
-        None => format!("git clone {}", github_link),
+    let github_link = format!("https://github.com/{}", &args.repo);
+
+    let mut clone_cmd = Command::new("git");
+
+    match &args.name {
+        Some(name) => {
+            clone_cmd.arg("clone");
+            clone_cmd.arg(github_link);
+            clone_cmd.arg(name);
+        }
+        None => {
+            clone_cmd.arg("clone");
+            clone_cmd.arg(github_link);
+        }
     };
 
-    let git_init_cmd = match args.gitinit {
-        Some(_) => format!("git init"),
-        None => String::from(""),
-    };
+    let clone_output = clone_cmd.execute_output().unwrap();
+    // TODO: do something with this output later?
+    println!("{:?}", clone_output);
 
-    let additional_deps_cmd = match args.with {
-        Some(with) => format!("cargo add {}", with),
-        None => String::from(""),
-    };
+    // TODO: Shit works till this point and stops working from here on. Try chaining all of the commands together.
 
-    let mut final_cmd = clone_cmd.clone();
+    // let mut ls_cmd = Command::new("ls");
+    // let _ = ls_cmd.output().expect("failed");
 
-    if git_init_cmd != "" && additional_deps_cmd != "" {
-        final_cmd = format!(
-            "{} && {} && {}",
-            clone_cmd, git_init_cmd, additional_deps_cmd
-        );
-    } else if git_init_cmd != "" {
-        final_cmd = format!("{} && {}", clone_cmd, git_init_cmd);
-    } else if additional_deps_cmd != "" {
-        final_cmd = format!("{} && {}", clone_cmd, additional_deps_cmd);
-    }
+    // let name = args.name.unwrap().clone();
+    // if name != "" {
+    //     let mut cd_cmd = Command::new("cd");
+    //     cd_cmd.arg("test");
+    //     let cd_output = cd_cmd.execute_output().unwrap();
+    //     println!("{:?}", cd_output);
+    // } else {
+    //     let mut cd_cmd = Command::new("cd");
+    //     let repo_name = args.repo.clone();
+    //     let mut repo_parts = repo_name.split("/");
+    //     let dir_name = repo_parts.next().unwrap();
+    //     cd_cmd.arg(dir_name);
+    // }
 
-    println!("{final_cmd}");
+    // if args.gitinit.unwrap() {
+    //     let mut git_init_cmd = Command::new("git");
+    //     git_init_cmd.arg("init");
+    //     let git_init_output = git_init_cmd.execute_output().unwrap();
+    //     // TODO: do something with this output later?
+    //     println!("{:?}", git_init_output);
+    // }
+
+    // let additional_deps = args.with.unwrap().clone();
+    // if additional_deps != "" {
+    //     let mut cargo_cmd = Command::new("cargo");
+    //     cargo_cmd.arg("add");
+    //     cargo_cmd.arg(additional_deps);
+    //     let cargo_output = cargo_cmd.execute_output().unwrap();
+    //     // TODO: do something with this output later?
+    //     println!("{:?}", cargo_output);
+    // }
 }
