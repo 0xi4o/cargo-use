@@ -1,4 +1,4 @@
-use clap::{arg, value_parser, Arg, Command};
+use clap::{arg, value_parser, Arg, ArgAction, Command};
 
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -19,9 +19,14 @@ pub fn parse_args() -> Arguments {
                 .required(true),
             arg!(-n --name <NAME> "Name of the project to create from the given repo").value_parser(value_parser!(String)),
             arg!(-g --gitinit <GIT_INIT> "Initialize a git repository after creating the project.").value_parser(value_parser!(bool)),
-            arg!(-w --with <WITH> "List of additional dependencies to add the project. Space-separated, surround by quotes.")
+            Arg::new("with")
+                .help("List of additional dependencies to add the project. Space-separated, surround by quotes.")
+                .short('w')
+                .long("with")
+                .value_name("WITH")
                 .value_delimiter(' ')
-                .value_parser(value_parser!(String))
+                .value_delimiter(',')
+                .action(ArgAction::Append)
         ]);
     let cmd = Command::new("cargo")
         .bin_name("cargo")
