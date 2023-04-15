@@ -6,7 +6,7 @@ repository = "https://github.com/i4o-dev/cargo-use"
 readme = "README.md"
 keywords = ["cargo", "use", "project", "cli", "dependencies"]
 categories = ["development-tools::cargo-plugins"]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "MIT"
 
