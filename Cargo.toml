@@ -14,4 +14,3 @@ license = "MIT"
 
 [dependencies]
 clap = { version = "4.2.2", features = ["derive"] }
-execute = "0.2.12"
