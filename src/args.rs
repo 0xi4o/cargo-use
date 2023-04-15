@@ -14,7 +14,7 @@ pub fn parse_args() -> Arguments {
         .author("Ilango Rajagopal")
         .args([
             Arg::new("repo")
-                .help("Github repository to use as a template for the new project. You can either use the full link or <username>/<repo-name>.")
+                .help("Github repository to use as a template for the new project. You can either use the full link or <user_or_org_slug>/<repo-name>.")
                 .required(true),
             arg!(-n --name <NAME> "Name of the project to create from the given repo").value_parser(value_parser!(String)),
             Arg::new("with")
