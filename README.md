@@ -4,7 +4,7 @@
 Cargo subcommand to start a new Rust project from a boilerplate/template repository.
 
 
-## Prequisites
+## Prerequisites
 
 - `git`
 ## Installation
@@ -18,7 +18,7 @@ cargo install cargo-use
 ## Usage
 
 ```bash
-cargo use <username>/<repo-name>
+cargo use <user_or_org_name>/<repo-name>
 ```
 
 Default:
@@ -34,9 +34,4 @@ cargo use i4o-dev/startrs --name test-project
 With additional dependencies:
 ```bash
 cargo use i4o-dev/startrs --with tokio axum
-```
-
-Initialize git repo:
-```bash
-cargo use i4o-dev/startrs --gitinit true
 ```
