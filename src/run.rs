@@ -1,63 +1,79 @@
-use execute::Execute;
-use std::process::Command;
+use std::{env, path::Path, process::Command};
 
 use crate::args::Arguments;
 
-pub fn execute(args: Arguments) {
-    let github_link = format!("https://github.com/{}", &args.repo);
+pub fn execute_all(args: Arguments) {
+    let repo = args.repo.clone();
+    let name = args.name.clone();
+    let with = args.with.clone();
+    let clone_success = execute_clone(&repo, &name);
 
-    let mut clone_cmd = Command::new("git");
+    let repo_name = String::from(repo.split('/').next().unwrap());
+    if clone_success {
+        let cd_success = match &name {
+            Some(name) => execute_cd(&name),
+            None => execute_cd(&repo_name),
+        };
 
-    match &args.name {
+        if cd_success {
+            let ca_success = execute_cargo_add(&with);
+            println!("{ca_success}");
+        }
+    }
+}
+
+fn execute_clone(repo: &String, name: &Option<String>) -> bool {
+    let github_link = format!("https://github.com/{}", repo);
+
+    // TODO: Check if this repo exists first before attempting to clone. If it doesn't exist, throw an error.
+    let mut command = Command::new("git");
+    match name {
         Some(name) => {
-            clone_cmd.arg("clone");
-            clone_cmd.arg(github_link);
-            clone_cmd.arg(name);
+            command.args(["clone", &github_link, name]);
         }
         None => {
-            clone_cmd.arg("clone");
-            clone_cmd.arg(github_link);
+            command.args(["clone", &github_link]);
         }
     };
 
-    let clone_output = clone_cmd.execute_output().unwrap();
-    // TODO: do something with this output later?
-    println!("{:?}", clone_output);
+    let status = command.status();
+    match status {
+        Ok(status) => {
+            status.success()
+        },
+        Err(e) => panic!(
+            "Failed to clone repo. Check if the repo exists, there are no typos, and that the repo is public. The process returned this error: {}", e
+        )
+    }
+}
 
-    // TODO: Shit works till this point and stops working from here on. Try chaining all of the commands together.
+fn execute_cd(dir: &String) -> bool {
+    // TODO: The current working directory actually changes but it doesn't reflect in the shell. Fix this.
+    if Path::new(dir).exists() {
+        env::set_current_dir(dir).is_ok()
+    } else {
+        false
+    }
+}
 
-    // let mut ls_cmd = Command::new("ls");
-    // let _ = ls_cmd.output().expect("failed");
+fn execute_cargo_add(deps: &Option<String>) -> bool {
+    match deps {
+        Some(deps) => {
+            let mut mods = deps.split(" ").collect::<Vec<&str>>();
+            let mut args = vec!["add"];
+            args.append(&mut mods);
+            let mut command = Command::new("cargo");
+            command.args(args);
 
-    // let name = args.name.unwrap().clone();
-    // if name != "" {
-    //     let mut cd_cmd = Command::new("cd");
-    //     cd_cmd.arg("test");
-    //     let cd_output = cd_cmd.execute_output().unwrap();
-    //     println!("{:?}", cd_output);
-    // } else {
-    //     let mut cd_cmd = Command::new("cd");
-    //     let repo_name = args.repo.clone();
-    //     let mut repo_parts = repo_name.split("/");
-    //     let dir_name = repo_parts.next().unwrap();
-    //     cd_cmd.arg(dir_name);
-    // }
-
-    // if args.gitinit.unwrap() {
-    //     let mut git_init_cmd = Command::new("git");
-    //     git_init_cmd.arg("init");
-    //     let git_init_output = git_init_cmd.execute_output().unwrap();
-    //     // TODO: do something with this output later?
-    //     println!("{:?}", git_init_output);
-    // }
-
-    // let additional_deps = args.with.unwrap().clone();
-    // if additional_deps != "" {
-    //     let mut cargo_cmd = Command::new("cargo");
-    //     cargo_cmd.arg("add");
-    //     cargo_cmd.arg(additional_deps);
-    //     let cargo_output = cargo_cmd.execute_output().unwrap();
-    //     // TODO: do something with this output later?
-    //     println!("{:?}", cargo_output);
-    // }
+            println!("Executing: {:?}", command);
+            let status = command.status();
+            match status {
+                Ok(status) => status.success(),
+                Err(e) => {
+                    panic!("Failed to install additional dependencies. Process returned: {e}")
+                }
+            }
+        }
+        None => false,
+    }
 }
