@@ -1,7 +1,12 @@
 [package]
 name = "cargo-use"
+description = "Cargo subcommand to start a new Rust project from a boilerplate/template repository."
+homepage = "https://github.com/i4o-dev/cargo-use"
+repository = "https://github.com/i4o-dev/cargo-use"
+readme = "README.md"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
