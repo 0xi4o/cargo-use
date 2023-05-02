@@ -35,3 +35,9 @@ With additional dependencies:
 ```bash
 cargo use i4o-dev/startrs --with tokio axum
 ```
+
+## TODO
+
+- [ ] Change name in `Cargo.toml` if name is given
+- [ ] Repo could include full URL or just `<username>/<repo>` format. Both should work.
+- [ ] Unset git remote after the repo is created
