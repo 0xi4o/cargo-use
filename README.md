@@ -20,6 +20,10 @@ cargo install cargo-use
 ```bash
 cargo use <user_or_org_name>/<repo-name>
 ```
+or
+```bash
+cargo use https://github.com/<user_or_org_name>/<repo-name>
+```
 
 Default:
 ```bash
