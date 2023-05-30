@@ -5,13 +5,13 @@ use crate::args::Arguments;
 pub fn execute_all(args: Arguments) {
     let repo = args.repo.clone();
     let name = args.name.clone();
-    let with = args.with.clone();
+    let with = args.with;
     let clone_success = execute_clone(&repo, &name);
 
     let repo_name = String::from(repo.split('/').next().unwrap());
     if clone_success {
         let cd_success = match &name {
-            Some(name) => execute_cd(&name),
+            Some(name) => execute_cd(name),
             None => execute_cd(&repo_name),
         };
 
@@ -23,7 +23,11 @@ pub fn execute_all(args: Arguments) {
 }
 
 fn execute_clone(repo: &String, name: &Option<String>) -> bool {
-    let github_link = format!("https://github.com/{}", repo);
+    let github_link = if repo.starts_with("https") {
+        repo.to_string()
+    } else {
+        format!("https://github.com/{}", repo)
+    };
 
     // TODO: Check if this repo exists first before attempting to clone. If it doesn't exist, throw an error.
     let mut command = Command::new("git");
@@ -59,7 +63,7 @@ fn execute_cd(dir: &String) -> bool {
 fn execute_cargo_add(deps: &Option<String>) -> bool {
     match deps {
         Some(deps) => {
-            let mut mods = deps.split(" ").collect::<Vec<&str>>();
+            let mut mods = deps.split(' ').collect::<Vec<&str>>();
             let mut args = vec!["add"];
             args.append(&mut mods);
             let mut command = Command::new("cargo");
